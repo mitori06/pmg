@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editor
+.vscode/*
+!.vscode/settings.json
+.idea/
+
+# Logs
+*.log
+
+# Node (念のため)
+node_modules/
