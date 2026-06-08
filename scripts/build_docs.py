@@ -91,6 +91,12 @@ def main():
     # 4. Images.
     shutil.copytree(os.path.join(ROOT, "Image"), os.path.join(DOCS, "Image"))
 
+    # 5. Static downloadable assets (e.g. the PDF guide linked from the LP).
+    for name in ("yakusoku-tegata-guide.pdf",):
+        src = os.path.join(ROOT, name)
+        if os.path.exists(src):
+            shutil.copy2(src, os.path.join(DOCS, name))
+
     print("built docs/ (cipher %d bytes)" % len(cipher))
 
 
