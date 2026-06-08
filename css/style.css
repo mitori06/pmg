@@ -1177,6 +1177,9 @@ h6 {
   background: linear-gradient(180deg, #8d2118 0, #73110d 100%);
   color: #fff;
 }
+.comparison-grid .company-col:last-child .company-head.dark {
+  border-radius: 0 20px 0 0;
+}
 .company-head {
   display: flex;
   align-items: center;
