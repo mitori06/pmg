@@ -301,6 +301,33 @@ h6 {
   line-height: 1.8;
   margin-top: 18px;
 }
+#consultation-bottom .form-title { font-size: 26px; }
+@media (min-width: 768px) {
+  #consultation-bottom.consultation-form { max-width: 780px; }
+}
+#consultation-bottom .form-subtitle { font-size: 20px; }
+#consultation-bottom .field-group label { font-size: 19px; }
+#consultation-bottom .field-group input,
+#consultation-bottom .field-group select { font-size: 18px; }
+#consultation-bottom .submit-btn { font-size: 22px; }
+#consultation-bottom .form-note { font-size: 16px; }
+@media (max-width: 767px) {
+  #consultation-bottom .form-title { font-size: 20px; }
+  #consultation-bottom .form-subtitle { font-size: 14px; }
+  #consultation-bottom .field-group label { font-size: 14px; }
+  #consultation-bottom .field-group input,
+  #consultation-bottom .field-group select { font-size: 14px; }
+  #consultation-bottom .submit-btn { font-size: 16px; }
+  #consultation-bottom .form-note { font-size: 12px; }
+}
+@media (max-width: 767px) {
+  #consultation.consultation-form { max-width: 100%; }
+  #consultation .form-subtitle { font-size: 14px; }
+  #consultation .field-group label { font-size: 14px; }
+  #consultation .field-group input,
+  #consultation .field-group select { font-size: 14px; }
+  #consultation .submit-btn { font-size: 14px; }
+}
 @media (max-width: 767px) {
   .form-inner {
     padding: 40px 20px 25px;
@@ -335,9 +362,9 @@ h6 {
     right: 10px;
   }
   .submit-btn {
-    height: 31px;
-    margin-top: 0;
-    font-size: 12px;
+    height: 52px;
+    margin-top: 12px;
+    font-size: 16px;
   }
   .form-note {
     font-family: "Noto Sans JP", sans-serif;
@@ -2087,16 +2114,18 @@ img.step-icon {
     font-size: 16px;
   }
   .notice-ribbon {
-    font-size: 20px;
-    letter-spacing: 2px;
-    padding-right: 40px;
-    padding-left: 10px;
+    font-size: 13px;
+    letter-spacing: 0;
+    top: -12px;
+    left: 14px;
+    padding: 10px 26px 10px 14px;
+    white-space: nowrap;
   }
   .notice-title {
     font-size: 20px;
   }
   .notice-box {
-    padding: 70px 10px 40px;
+    padding: 48px 14px 40px;
   }
   .notice-title {
     font-size: 20px;

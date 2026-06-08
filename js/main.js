@@ -22,16 +22,9 @@ document.querySelectorAll(".faq-trigger").forEach((trigger) => {
   });
 });
 
-function initAOS() {
-  if (window.AOS) {
-    AOS.init({
-      duration: 1000,
-      once: true,
-      offset: 100,
-      easing: "ease-out-cubic",
-    });
-  } else {
-    setTimeout(initAOS, 50);
-  }
-}
-initAOS();
+AOS.init({
+  duration: 1000,
+  once: true,
+  offset: 100,
+  easing: "ease-out-cubic",
+});
