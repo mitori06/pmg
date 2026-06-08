@@ -59,11 +59,8 @@ def encrypt(plaintext, password):
 
 
 def gate_template():
-    tmpl = subprocess.run(
-        ["git", "show", "HEAD:docs/index.html"],
-        cwd=ROOT, capture_output=True, check=True,
-    ).stdout.decode("utf-8")
-    return tmpl
+    with open(os.path.join(ROOT, "scripts", "gate_template.html"), encoding="utf-8") as f:
+        return f.read()
 
 
 def main():

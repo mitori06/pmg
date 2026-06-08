@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>PMG</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height:100%; }
+  body { margin:0; font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+         background:#ffffff; color:#1a1a1a; }
+  /* Hidden by default so returning (cached) visitors never see the gate flash. */
+  #center { min-height:100%; display:none; align-items:center; justify-content:center; }
+  #frame { position:fixed; inset:0; width:100%; height:100%; border:0; display:none; }
+  .box { width:100%; max-width:360px; padding:32px 28px; background:#ffffff; border:1px solid #e3e6ea;
+         border-radius:14px; box-shadow:0 8px 40px rgba(0,0,0,.08); }
+  h1 { font-size:18px; margin:0 0 4px; font-weight:600; }
+  p { font-size:13px; color:#6b7280; margin:0 0 20px; }
+  input { width:100%; padding:12px 14px; font-size:15px; border:1px solid #d1d5db; border-radius:9px;
+          background:#ffffff; color:#1a1a1a; outline:none; }
+  input:focus { border-color:#5b8cff; }
+  button { width:100%; margin-top:12px; padding:12px; font-size:15px; font-weight:600; border:none;
+           border-radius:9px; background:#5b8cff; color:#fff; cursor:pointer; }
+  button:hover { background:#4a7bf0; }
+  button:disabled { opacity:.6; cursor:default; }
+  .err { color:#e3342f; font-size:13px; margin-top:12px; min-height:18px; }
+</style>
+</head>
+<body>
+<div id="center">
+  <div class="box" id="gate">
+    <h1>このページは保護されています</h1>
+    <p>閲覧にはパスワードが必要です。</p>
+    <form id="f">
+      <input id="pw" type="password" placeholder="パスワード" autocomplete="off">
+      <button id="btn" type="submit">表示する</button>
+      <div class="err" id="err"></div>
+    </form>
+  </div>
+</div>
+<iframe id="frame" title="PMG"></iframe>
+
+<script>
+var ITER = 200000;
+var CIPHER_B64 = "__CIPHER_B64__";
+// Remember a correct password on this device so repeat visits / in-page
+// navigation (e.g. thanks page -> back to top) never re-prompt.
+var STORE_KEY = "pmg_unlock_v1";
+
+function b64ToBytes(b64){
+  var bin = atob(b64); var len = bin.length; var u = new Uint8Array(len);
+  for (var i=0;i<len;i++) u[i] = bin.charCodeAt(i);
+  return u;
+}
+
+async function decrypt(password){
+  var raw = b64ToBytes(CIPHER_B64);
+  // openssl "Salted__" format: 8 magic + 8 salt + ciphertext
+  var magic = String.fromCharCode.apply(null, raw.slice(0,8));
+  if (magic !== "Salted__") throw new Error("format");
+  var salt = raw.slice(8,16);
+  var data = raw.slice(16);
+  var enc = new TextEncoder();
+  var keyMaterial = await crypto.subtle.importKey("raw", enc.encode(password),
+      {name:"PBKDF2"}, false, ["deriveBits"]);
+  var bits = await crypto.subtle.deriveBits(
+      {name:"PBKDF2", salt:salt, iterations:ITER, hash:"SHA-256"}, keyMaterial, 48*8);
+  var kb = new Uint8Array(bits);
+  var key = kb.slice(0,32); var iv = kb.slice(32,48);
+  var cryptoKey = await crypto.subtle.importKey("raw", key, {name:"AES-CBC"}, false, ["decrypt"]);
+  var plain = await crypto.subtle.decrypt({name:"AES-CBC", iv:iv}, cryptoKey, data);
+  return new TextDecoder("utf-8").decode(plain);
+}
+
+function render(html){
+  // Render inside an iframe so the page loads exactly like the original
+  // (proper script ordering, AOS, Tailwind all run on a real document load).
+  var frame = document.getElementById("frame");
+  frame.srcdoc = html;
+  document.getElementById("center").style.display = "none";
+  frame.style.display = "block";
+  document.title = "PMG";
+}
+
+function showGate(){
+  document.getElementById("center").style.display = "flex";
+  var pw = document.getElementById("pw");
+  if (pw) pw.focus();
+}
+
+function storeGet(){ try { return localStorage.getItem(STORE_KEY); } catch(e){ return null; } }
+function storeSet(v){ try { localStorage.setItem(STORE_KEY, v); } catch(e){} }
+function storeClear(){ try { localStorage.removeItem(STORE_KEY); } catch(e){} }
+
+document.getElementById("f").addEventListener("submit", async function(e){
+  e.preventDefault();
+  var btn = document.getElementById("btn");
+  var err = document.getElementById("err");
+  var pw = document.getElementById("pw").value;
+  err.textContent = ""; btn.disabled = true; btn.textContent = "確認中…";
+  try {
+    var html = await decrypt(pw);
+    storeSet(pw);
+    render(html);
+  } catch (ex) {
+    err.textContent = "パスワードが違います。";
+    btn.disabled = false; btn.textContent = "表示する";
+  }
+});
+
+// On load: silently unlock if this device already has a valid password,
+// otherwise reveal the gate. The content is never shown before decryption.
+(async function(){
+  var saved = storeGet();
+  if (saved) {
+    try { render(await decrypt(saved)); return; }
+    catch (ex) { storeClear(); }
+  }
+  showGate();
+})();
+</script>
+</body>
+</html>
