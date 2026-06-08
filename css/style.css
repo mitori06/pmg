@@ -102,6 +102,14 @@ h6 {
   background-clip: text;
   font-weight: 900;
 }
+@media (max-width: 767px) {
+  /* Keep the title to the two intended lines: never wrap within a line,
+     and shrink to fit the viewport width so "資金化。" stays on line 2. */
+  h1.bannerTitle {
+    white-space: nowrap;
+    font-size: clamp(16px, 6.4vw, 24px);
+  }
+}
 .award-badge {
   width: 180px;
   height: 180px;
